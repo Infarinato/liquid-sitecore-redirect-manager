@@ -59,7 +59,7 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
                     }
                     else if (resolvedMapping.RedirectType == RedirectType.ServerTransfer)
                     {
-                        HttpContext.Current.Server.TransferRequest(targetUrl);
+                        HttpContext.Current.Server.TransferRequest(this.GetPathAndQuery(targetUrl));
                     }
                     else
                     {

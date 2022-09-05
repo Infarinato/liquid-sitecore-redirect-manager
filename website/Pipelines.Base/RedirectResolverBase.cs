@@ -371,7 +371,7 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
                         // GetItemUrl appears to produce double trailing slashes for cross-site links: clean that up
                         redirectUrl = new UriBuilder(redirectUrl)
                         {
-                            Path = new Uri(redirectUrl).PathAndQuery.Replace("//", "/"),
+                            Path = this.GetPathAndQuery(redirectUrl).Replace("//", "/"),
                             Query = redirectLinkField.QueryString.TrimStart('?'),
                             Fragment = redirectLinkField.Anchor.TrimStart('#')
                         }.Uri.AbsoluteUri;
@@ -396,6 +396,11 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
             }
 
             return redirectUrl;
+        }
+
+        protected string GetPathAndQuery(string redirectUrl)
+        {
+            return new Uri(redirectUrl).PathAndQuery;
         }
 
         private static bool IsFromCurrentSite(Item item)

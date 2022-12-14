@@ -8,13 +8,13 @@
     <AssemblyName>LiquidSC.Foundation.RedirectManager</AssemblyName>
     <OutputType>Library</OutputType>
     <RootNamespace>LiquidSC.Foundation.RedirectManager</RootNamespace>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG;TRACE;SC93</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;SC103</DefineConstants>
     <Optimize>false</Optimize>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
     <DebugSymbols>false</DebugSymbols>
-    <DefineConstants>TRACE;SC93</DefineConstants>
+    <DefineConstants>TRACE;SC103</DefineConstants>
     <Optimize>true</Optimize>
     <WarningLevel>4</WarningLevel>
     <DebugType>pdbonly</DebugType>
@@ -67,6 +67,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SC92 Release|AnyCPU'">
     <OutputPath>bin\SC92 Release\</OutputPath>
     <DefineConstants>TRACE;SC92</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SC103 Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\SC103 Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SC103</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SC103 Release|AnyCPU'">
+    <OutputPath>bin\SC103 Release\</OutputPath>
+    <DefineConstants>TRACE;SC103</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -157,16 +177,17 @@
   <Choose>
     <When Condition="'$(Configuration)' == 'SC92 Debug' Or '$(Configuration)' == 'SC92 Release'">
       <ItemGroup>
-        <PackageReference Include="Sitecore.Kernel">
-          <Version>9.2.0</Version>
-        </PackageReference>
+        <PackageReference Include="Sitecore.Kernel" Version="9.2.0" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)' == 'SC93 Debug' Or '$(Configuration)' == 'SC93 Release'">
+      <ItemGroup>
+        <PackageReference Include="Sitecore.Kernel" Version="9.3.0" />
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Sitecore.Kernel">
-          <Version>9.3.0</Version>
-        </PackageReference>
+        <PackageReference Include="Sitecore.Kernel" Version="10.3.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

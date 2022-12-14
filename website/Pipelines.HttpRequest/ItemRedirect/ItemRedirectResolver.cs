@@ -197,10 +197,17 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
 
         public static string GetItemIdByPath(string path)
         {
-            var Item = Sitecore.Context.Database.SelectSingleItem(path);
-            if (Item != null)
+            try
             {
-                return Item.ID.ToString();
+                var item = Context.Database.SelectSingleItem(path);
+                if (item != null)
+                {
+                    return item.ID.ToString();
+                }
+            }
+            catch
+            {
+                return string.Empty;
             }
 
             return string.Empty;

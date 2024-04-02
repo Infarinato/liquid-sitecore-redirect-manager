@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiquidSC.Foundation.RedirectManager", "website\LiquidSC.Foundation.RedirectManager.csproj", "{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}"
 EndProject
@@ -38,6 +38,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		SC103 Debug|Any CPU = SC103 Debug|Any CPU
+		SC103 Release|Any CPU = SC103 Release|Any CPU
 		SC92 Debug|Any CPU = SC92 Debug|Any CPU
 		SC92 Release|Any CPU = SC92 Release|Any CPU
 		SC93 Debug|Any CPU = SC93 Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.SC103 Debug|Any CPU.ActiveCfg = SC103 Debug|Any CPU
+		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.SC103 Debug|Any CPU.Build.0 = SC103 Debug|Any CPU
+		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.SC103 Release|Any CPU.ActiveCfg = SC103 Release|Any CPU
+		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.SC103 Release|Any CPU.Build.0 = SC103 Release|Any CPU
 		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.SC92 Debug|Any CPU.ActiveCfg = SC92 Debug|Any CPU
 		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.SC92 Debug|Any CPU.Build.0 = SC92 Debug|Any CPU
 		{AC2DC2CE-FF9C-4F38-841C-96FF7C8DA672}.SC92 Release|Any CPU.ActiveCfg = SC92 Release|Any CPU

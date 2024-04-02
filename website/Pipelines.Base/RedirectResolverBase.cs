@@ -4,11 +4,12 @@ using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Links;
-#if SC93
+#if SC93 || SC103
 using Sitecore.Links.UrlBuilders;
 #endif
 using Sitecore.Pipelines.HttpRequest;
 using Sitecore.Resources.Media;
+using Sitecore.SecurityModel;
 using Sitecore.Sites;
 using Sitecore.Web;
 using System;
@@ -120,11 +121,14 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
 
         protected Item GetItem(string itemId)
         {
-            //var redirectSettingsId = ;
             if (!string.IsNullOrEmpty(itemId) && ID.TryParse(itemId, out ID iD))
             {
-                return Context.Database.GetItem(iD);
+                using (new SecurityDisabler())
+                {
+                    return Context.Database.GetItem(iD);
+                }
             }
+
             return null;
         }
 
@@ -331,7 +335,7 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
                 {
                     if (redirectLinkField.IsInternal)
                     {
-#if SC93
+#if SC93 || SC103
                         var urlOptions = (ItemUrlBuilderOptions)new DefaultItemUrlBuilderOptions();
 #else
                         var urlOptions = LinkManager.GetDefaultUrlOptions();
@@ -378,7 +382,7 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
                     }
                     else if (redirectLinkField.IsMediaLink)
                     {
-#if SC93
+#if SC93 || SC103
                         var urlOptions = new MediaUrlBuilderOptions();
 #else
                         var urlOptions = new MediaUrlOptions();

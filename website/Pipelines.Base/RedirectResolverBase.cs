@@ -3,12 +3,14 @@ using Sitecore;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
+using Sitecore.Diagnostics;
 using Sitecore.Links;
 #if SC93 || SC103
 using Sitecore.Links.UrlBuilders;
 #endif
 using Sitecore.Pipelines.HttpRequest;
 using Sitecore.Resources.Media;
+using Sitecore.SecurityModel;
 using Sitecore.Sites;
 using Sitecore.Web;
 using System;
@@ -120,11 +122,14 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
 
         protected Item GetItem(string itemId)
         {
-            //var redirectSettingsId = ;
             if (!string.IsNullOrEmpty(itemId) && ID.TryParse(itemId, out ID iD))
             {
-                return Context.Database.GetItem(iD);
+                using (new SecurityDisabler())
+                {
+                    return Context.Database.GetItem(iD);
+                }
             }
+
             return null;
         }
 
@@ -254,11 +259,24 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
 
         protected T GetCache<T>(string key)
         {
+            Log.Info("Getting mapping from cache...", nameof(this.GetCache));
+            Log.Info($"Cache databases: {string.Join(", ", this.CacheDatabases)}", nameof(this.GetCache));
             foreach (var cacheDatabase in this.CacheDatabases)
             {
                 if (cacheDatabase.ToLower() == Sitecore.Context.Database.Name.ToLower())
                 {
-                    return (T)HttpRuntime.Cache[key];
+                    Log.Info($"Getting cached mapping from {cacheDatabase.ToLower()}...", nameof(this.GetCache));
+                    try
+                    {
+                        var cachedObject = (T)HttpRuntime.Cache[key];
+                        Log.Info($"Cached mapping is {(cachedObject == null ? "null" : "not null")}", nameof(this.GetCache));
+                        return cachedObject;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Could not get mapping from cache: {ex.Message}", nameof(this.GetCache));
+                        return default;
+                    }
                 }
             }
 
@@ -271,7 +289,15 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
             {
                 Cache cache = HttpRuntime.Cache;
                 DateTime utcNow = DateTime.UtcNow;
-                cache.Add(key, value, null, utcNow.AddMinutes((double)this.CacheExpiration), TimeSpan.Zero, CacheItemPriority.Normal, null);
+                try
+                {
+                    Log.Info("Adding mapping to cache...", nameof(this.SetCache));
+                    cache.Add(key, value, null, utcNow.AddMinutes((double)this.CacheExpiration), TimeSpan.Zero, CacheItemPriority.Normal, null);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Could not add to cache: {ex.Message}", nameof(this.SetCache));
+                }
             }
         }
 

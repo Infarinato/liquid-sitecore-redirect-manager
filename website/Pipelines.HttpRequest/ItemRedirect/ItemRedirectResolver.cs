@@ -1,5 +1,6 @@
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
+using Sitecore.Diagnostics;
 using LiquidSC.Foundation.RedirectManager.Extensions;
 using LiquidSC.Foundation.RedirectManager.Pipelines.Base;
 using Sitecore.Pipelines.HttpRequest;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Sitecore;
+using System.IO;
 
 namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
 {
@@ -17,23 +19,29 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
     {
         public ItemRedirectResolver()
         {
+            Log.Info($"Initialized {nameof(ItemRedirectResolver)}", "ItemRedirectResolver");
         }
 
         public override void ProcessRequest(HttpRequestArgs args)
         {
+            Log.Info($"Start processing request for {nameof(ItemRedirectResolver)}...", nameof(this.ProcessRequest));
+
             //if the source request url isn't associated with an item, skip this processor
             if (Context.Item == null)
                 return;
 
             string itemId = Context.Item.ID.ToString();
+            Log.Info($"Found item with ID {itemId}", nameof(this.ProcessRequest));
             ItemRedirect resolvedMapping = this.GetResolvedMapping(itemId);
 
             if (resolvedMapping == null)
             {
+                Log.Info($"Mapping for {itemId} not found in cache", nameof(this.ProcessRequest));
                 resolvedMapping = this.FindMapping(itemId);
 
                 if (resolvedMapping != null)
                 {
+                    Log.Info($"Mapping for {itemId} found in database", nameof(this.ProcessRequest));
                     var dictionaryitem = GetCache<Dictionary<string, ItemRedirect>>(ResolvedItemRedirectPrefix)
                                       ?? new Dictionary<string, ItemRedirect>();
 
@@ -49,6 +57,8 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
                 {
                     // If we are preserving the incoming query string, append it now
                     var targetUrl = this.GetTargetUrlWithPreservedQueryString(resolvedMapping);
+                    Log.Info($"Target URL: {targetUrl}", nameof(this.ProcessRequest));
+                    Log.Info($"Redirect type: {resolvedMapping.RedirectType}", nameof(this.ProcessRequest));
                     if (resolvedMapping.RedirectType == RedirectType.Redirect301)
                     {
                         this.Redirect301(HttpContext.Current, targetUrl);
@@ -107,6 +117,7 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
 
                 if (itemRedirects == null)
                 {
+                    Log.Info($"No cached redirect items found for prefix {AllItemRedirectMappingsPrefix}", nameof(this.MappingsMap));
                     itemRedirects = new List<ItemRedirect>();
 
                     //get the settings item
@@ -114,13 +125,17 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
 
                     List<Item> redirectItems = new List<Item>();
 
+                    Log.Info($"Redirect setting item is {(redirectSettingsItem == null ? "null" : "not null")}", nameof(this.MappingsMap));
                     if (redirectSettingsItem != null)
                     {
                         //get the descendants that inherit the Redirect template's ID
-                        redirectItems.AddRange((
-                            from i in (IEnumerable<Item>)redirectSettingsItem.Axes.GetDescendants()
-                            where i.IsDerived(Templates.ItemRedirect.ID)
-                            select i).ToList<Item>());
+                        using (new SecurityDisabler())
+                        {
+                            redirectItems.AddRange((
+                                from i in (IEnumerable<Item>)redirectSettingsItem.Axes.GetDescendants()
+                                where i.IsDerived(Templates.ItemRedirect.ID)
+                                select i).ToList<Item>());
+                        }
                     }
 
                     redirectItems.Sort(new TreeComparer());
@@ -128,13 +143,13 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
                     //foreach redirect item
                     foreach (var redirectItem in redirectItems)
                     {
-                        //TODO experimental
-                        //if (IsRedirectLoop(redirectItem))
-                        //    continue;
-
                         RedirectType redirectType;
+                        using (new SecurityDisabler())
+                        {
+                            Enum.TryParse<RedirectType>(redirectItem[Templates.RedirectSettings.Fields.RedirectType], out redirectType);
+                        }
 
-                        Enum.TryParse<RedirectType>(redirectItem[Templates.RedirectSettings.Fields.RedirectType], out redirectType);
+                        Log.Info($"Redirect type is {redirectType}", nameof(this.MappingsMap));
 
                         string sourceItemId, targetUrl;
                         using (new SecurityDisabler())
@@ -202,11 +217,13 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
                 var item = Context.Database.SelectSingleItem(path);
                 if (item != null)
                 {
+                    Log.Info($"Found item for {path}", nameof(GetItemIdByPath));
                     return item.ID.ToString();
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Error(ex.Message, nameof(GetItemIdByPath));
                 return string.Empty;
             }
 

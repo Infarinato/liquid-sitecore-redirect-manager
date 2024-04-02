@@ -117,10 +117,13 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
                     if (redirectSettingsItem != null)
                     {
                         //get the descendants that inherit the Redirect template's ID
-                        redirectItems.AddRange((
+                        using (new SecurityDisabler())
+                        {
+                            redirectItems.AddRange((
                             from i in (IEnumerable<Item>)redirectSettingsItem.Axes.GetDescendants()
                             where i.IsDerived(Templates.ItemRedirect.ID)
                             select i).ToList<Item>());
+                        }
                     }
 
                     redirectItems.Sort(new TreeComparer());
@@ -128,12 +131,7 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
                     //foreach redirect item
                     foreach (var redirectItem in redirectItems)
                     {
-                        //TODO experimental
-                        //if (IsRedirectLoop(redirectItem))
-                        //    continue;
-
                         RedirectType redirectType;
-
                         Enum.TryParse<RedirectType>(redirectItem[Templates.RedirectSettings.Fields.RedirectType], out redirectType);
 
                         string sourceItemId, targetUrl;

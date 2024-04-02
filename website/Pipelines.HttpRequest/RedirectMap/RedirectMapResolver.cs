@@ -4,6 +4,7 @@ using Sitecore;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Pipelines.HttpRequest;
+using Sitecore.SecurityModel;
 using Sitecore.Text;
 using System;
 using System.Collections.Generic;
@@ -91,24 +92,29 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.HttpRequest
 
                     Item globalRedirectFolderItem = GetItem(Constants.GlobalRedirectsFolderId);
 
-                    
                     if (globalRedirectFolderItem != null)
                     {
-                        redirectItems.AddRange((
+                        using (new SecurityDisabler())
+                        {
+                            redirectItems.AddRange((
                             from i in (IEnumerable<Item>)globalRedirectFolderItem.Axes.GetDescendants()
                             where i.IsDerived(Templates.RedirectMap.ID)
                             select i).ToList<Item>());
+                        }
                     }
 
                     Item redirectSettingsItem = GetItem(GetRedirectSettingsId);
 
                     if (redirectSettingsItem != null)
                     {
-                        //to prevent cnnflicts, only add entries that don't already exist in the global redirects (I.E global takes precendence)
-                        redirectItems.AddRangeIfNew((
+                        //to prevent conflicts, only add entries that don't already exist in the global redirects (i.e., global takes precedence)
+                        using (new SecurityDisabler())
+                        {
+                            redirectItems.AddRangeIfNew((
                             from i in (IEnumerable<Item>)redirectSettingsItem.Axes.GetDescendants()
                             where i.IsDerived(Templates.RedirectMap.ID)
                             select i).ToList<Item>());
+                        }
                     }
 
                     redirectItems.Sort(new TreeComparer());

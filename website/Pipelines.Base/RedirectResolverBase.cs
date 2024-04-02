@@ -9,6 +9,7 @@ using Sitecore.Links.UrlBuilders;
 #endif
 using Sitecore.Pipelines.HttpRequest;
 using Sitecore.Resources.Media;
+using Sitecore.SecurityModel;
 using Sitecore.Sites;
 using Sitecore.Web;
 using System;
@@ -120,11 +121,14 @@ namespace LiquidSC.Foundation.RedirectManager.Pipelines.Base
 
         protected Item GetItem(string itemId)
         {
-            //var redirectSettingsId = ;
             if (!string.IsNullOrEmpty(itemId) && ID.TryParse(itemId, out ID iD))
             {
-                return Context.Database.GetItem(iD);
+                using (new SecurityDisabler())
+                {
+                    return Context.Database.GetItem(iD);
+                }
             }
+
             return null;
         }
 
